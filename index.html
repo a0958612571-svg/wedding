@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>婚禮排座 - 標籤統計版</title>
+    <title>婚禮排座助手 - 最終修正版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .canvas-bg { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
@@ -10,54 +10,45 @@
         .modal.active { display: flex; }
         .table-circle { transition: all 0.2s; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .selected-guest { border: 2px solid #4f46e5 !important; background-color: #eef2ff !important; }
-        .tag-v { background-color: #dcfce7; color: #166534; } /* 素食 */
-        .tag-m { background-color: #fee2e2; color: #991b1b; } /* 男方 */
-        .tag-f { background-color: #f0f9ff; color: #075985; } /* 女方 */
+        .writing-vertical { writing-mode: vertical-lr; }
     </style>
 </head>
-<body class="bg-slate-50 h-screen flex flex-col overflow-hidden text-slate-800 font-sans">
+<body class="bg-slate-50 h-screen flex flex-col overflow-hidden text-slate-800">
 
     <header class="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm z-20">
         <div class="flex items-center gap-4">
             <h1 class="text-xl font-black text-indigo-600 italic">WEDDING</h1>
-            <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Tag & Stats</span>
+            <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Final Stable</span>
         </div>
         <div class="flex gap-2">
-            <button onclick="addNewTable()" class="bg-white border border-indigo-200 text-indigo-600 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-50 transition">＋新增桌次</button>
-            <button onclick="toggleModal('guest-modal')" class="bg-white border px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-50 transition">＋批量匯入</button>
-            <button onclick="generateExportData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-700 transition">📊 匯出報告</button>
-            <button onclick="resetApp()" class="text-red-400 text-xs px-2 font-bold hover:text-red-600 transition">重置</button>
+            <button onclick="addNewTable()" class="bg-white border border-indigo-200 text-indigo-600 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-50">＋新增桌次</button>
+            <button onclick="toggleModal('guest-modal')" class="bg-white border px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-50">＋批量匯入</button>
+            <button onclick="generateExportData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-700">📊 匯出報告</button>
+            <button onclick="resetApp()" class="text-red-400 text-xs px-2 font-bold hover:text-red-600">重置</button>
         </div>
     </header>
 
     <main class="flex flex-1 overflow-hidden">
         <aside class="w-72 bg-white border-r flex flex-col shadow-lg z-10">
             <div class="p-4 border-b bg-slate-50">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-bold text-xs uppercase text-slate-500 italic">Unassigned (<span id="unassigned-count">0</span>)</span>
-                </div>
-                <div class="flex gap-1 flex-wrap">
-                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-bold">加 (素) 字自動標記</span>
-                </div>
+                <span class="font-bold text-xs uppercase text-slate-500 italic">待分配名單 (<span id="unassigned-count">0</span>)</span>
             </div>
             <div id="guest-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
         </aside>
 
         <section class="flex-1 relative canvas-bg bg-slate-100 overflow-auto">
             <div class="min-w-[1100px] py-12 flex flex-col items-center">
-                
                 <div class="w-full flex flex-col items-center mb-16">
                     <div class="bg-slate-800 text-white px-20 py-1.5 rounded-b-2xl mb-12 text-[10px] font-black tracking-[1em] uppercase shadow-xl">STAGE 舞台中心</div>
                     <div id="main-table-container"></div>
                 </div>
-
                 <div class="flex justify-center items-start gap-20">
                     <div class="w-[320px] flex flex-col items-center">
                         <div id="left-6" class="grid grid-cols-2 gap-8 p-6 bg-white/40 border-2 border-dashed border-slate-200 rounded-[2rem]"></div>
                         <div class="h-16 flex items-center justify-center italic text-slate-300 font-bold text-[10px] tracking-[0.5em] uppercase">Side Aisle</div>
                         <div id="left-extra" class="grid grid-cols-2 gap-8 p-6 bg-white/40 border-2 border-dashed border-slate-200 rounded-[2rem] min-h-[140px]"></div>
                     </div>
-                    <div class="flex flex-col items-center pt-24"><div class="writing-vertical text-slate-300 font-black text-xs uppercase tracking-[1em] opacity-40" style="writing-mode: vertical-lr;">RED CARPET</div></div>
+                    <div class="flex flex-col items-center pt-24"><div class="writing-vertical text-slate-300 font-black text-xs uppercase tracking-[1em] opacity-40">RED CARPET</div></div>
                     <div class="w-[320px] flex flex-col items-center">
                         <div id="right-6" class="grid grid-cols-2 gap-8 p-6 bg-white/40 border-2 border-dashed border-slate-200 rounded-[2rem]"></div>
                         <div class="h-16 flex items-center justify-center italic text-slate-300 font-bold text-[10px] tracking-[0.5em] uppercase">Side Aisle</div>
@@ -68,29 +59,48 @@
         </section>
     </main>
 
-    <div id="detail-modal" class="modal"><div class="bg-white rounded-3xl shadow-2xl w-[380px] p-8 text-center">
-        <div class="flex items-center justify-center gap-3 mb-2">
-            <h3 id="dt-name" class="font-black text-2xl text-indigo-600 tracking-tighter"></h3>
-            <button onclick="editTableName()" class="text-slate-300 hover:text-indigo-600 text-xs">✏️</button>
+    <div id="guest-modal" class="modal">
+        <div class="bg-white rounded-3xl shadow-2xl w-[400px] p-8">
+            <h3 class="font-black mb-2 text-indigo-600 italic">BATCH IMPORT</h3>
+            <p class="text-[10px] text-slate-400 mb-4">姓名後加 (素) 字可自動標記。</p>
+            <textarea id="guest-input" rows="8" class="w-full border-2 border-slate-100 p-4 rounded-2xl text-sm bg-slate-50 outline-none" placeholder="王小明 (素)&#10;李大華"></textarea>
+            <div class="flex justify-end mt-6 gap-3">
+                <button onclick="toggleModal('guest-modal')" class="font-bold text-slate-400 px-4">取消</button>
+                <button onclick="addGuests()" class="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg">匯入</button>
+            </div>
         </div>
-        <div id="dt-stats" class="mb-6 flex justify-center gap-2"></div> <div id="dt-list" class="space-y-2 mb-8 max-h-72 overflow-y-auto px-1 text-left"></div>
-        <div id="dt-delete-area"></div>
-        <button onclick="toggleModal('detail-modal')" class="w-full bg-slate-100 text-slate-500 py-3 rounded-2xl mt-4 font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition">Close</button>
-    </div></div>
+    </div>
 
-    <div id="guest-modal" class="modal"><div class="bg-white rounded-3xl shadow-2xl w-[400px] p-8">
-        <h3 class="font-black mb-2 text-indigo-600 italic">BATCH IMPORT</h3>
-        <p class="text-[10px] text-slate-400 mb-4">提示：姓名後加 (素) 可自動標記素食者。</p>
-        <textarea id="guest-input" rows="8" class="w-full border-2 border-slate-100 p-4 rounded-2xl text-sm bg-slate-50 outline-none focus:border-indigo-500" placeholder="王小明 (素)&#10;李大華&#10;..."></textarea>
-        <div class="flex justify-end mt-6 gap-3"><button onclick="toggleModal('guest-modal')" class="font-bold text-slate-400 px-4">取消</button><button onclick="addGuests()" class="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg">匯入</button></div>
-    </div></div>
+    <div id="detail-modal" class="modal">
+        <div class="bg-white rounded-3xl shadow-2xl w-[380px] p-8 text-center">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <h3 id="dt-name" class="font-black text-2xl text-indigo-600 tracking-tighter"></h3>
+                <button onclick="editTableName()" class="text-slate-300 hover:text-indigo-600">✏️</button>
+            </div>
+            <div id="dt-stats" class="mb-4 flex justify-center gap-2"></div>
+            <div id="dt-list" class="space-y-2 mb-6 max-h-72 overflow-y-auto px-1 text-left"></div>
+            <div id="dt-delete-area"></div>
+            <button onclick="toggleModal('detail-modal')" class="w-full bg-slate-100 text-slate-500 py-3 rounded-2xl mt-4 font-bold text-xs uppercase tracking-widest">Close</button>
+        </div>
+    </div>
+
+    <div id="export-modal" class="modal">
+        <div class="bg-white rounded-3xl shadow-2xl w-[550px] p-8">
+            <h3 class="font-black mb-4 text-indigo-600 italic text-xl">📊 SEATING REPORT</h3>
+            <textarea id="export-text" rows="12" class="w-full border-2 border-slate-50 p-4 rounded-2xl text-xs font-mono bg-slate-50 mb-6 outline-none" readonly></textarea>
+            <div class="flex gap-3">
+                <button onclick="copyToClipboard()" class="flex-1 bg-indigo-600 text-white py-3 rounded-2xl font-bold shadow-lg">複製到剪貼簿</button>
+                <button onclick="toggleModal('export-modal')" class="px-8 bg-slate-100 rounded-2xl font-bold text-slate-500">關閉</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let guests = [];
         let tables = [];
         let selectedId = null;
         let currentEditingTid = null;
-        const KEY = 'WEDDING_V3_9_TAGS';
+        const KEY = 'WEDDING_V3_9_FINAL_STABLE';
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
 
@@ -109,21 +119,19 @@
             const gList = document.getElementById('guest-list');
             const unassigned = guests.filter(g => !g.tId);
             gList.innerHTML = unassigned.map(g => `
-                <div onclick="selectedId=(selectedId===${g.id}?null:${g.id});render();" class="p-3 bg-white border-2 rounded-xl cursor-pointer text-sm font-bold flex justify-between items-center transition-all ${selectedId===g.id?'selected-guest border-indigo-500 shadow-md':'border-transparent hover:border-slate-100'}">
+                <div onclick="selectedId=(selectedId===${g.id}?null:${g.id});render();" class="p-3 bg-white border-2 rounded-xl cursor-pointer text-sm font-bold flex justify-between items-center ${selectedId===g.id?'selected-guest border-indigo-500':'border-transparent'}">
                     <span>${g.name}</span>
                     ${g.isVeg ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-bold">素</span>' : ''}
                 </div>
-            `).join('') || '<div class="py-10 text-center text-slate-300 text-xs italic">名單空空如也</div>';
-            
+            `).join('');
             document.getElementById('unassigned-count').innerText = unassigned.length;
             ['main-table-container','left-6','left-extra','right-6','right-extra'].forEach(id => document.getElementById(id).innerHTML = '');
-
             tables.forEach(t => {
                 const vegCount = t.list.filter(gid => guests.find(g => g.id === gid.id)?.isVeg).length;
                 const div = document.createElement('div');
-                div.className = `table-circle w-28 h-28 rounded-full bg-white flex flex-col items-center justify-center cursor-pointer relative ${t.section === 'main' ? 'w-40 h-40 border-amber-400 bg-amber-50 shadow-amber-100 shadow-xl' : 'border-slate-50'}`;
+                div.className = `table-circle w-28 h-28 rounded-full bg-white flex flex-col items-center justify-center cursor-pointer relative ${t.section === 'main' ? 'w-40 h-40 border-amber-400 bg-amber-50 shadow-xl' : 'border-slate-50'}`;
                 div.innerHTML = `
-                    <span class="text-[8px] font-black text-slate-300 uppercase mb-1 truncate w-20 text-center">${t.name}</span>
+                    <span class="text-[8px] font-black text-slate-300 uppercase truncate w-20 text-center">${t.name}</span>
                     <span class="text-xl font-black text-slate-800">${t.list.length}<span class="text-[10px] text-slate-300">/${t.cap}</span></span>
                     ${vegCount > 0 ? `<span class="text-[8px] mt-1 text-green-600 font-bold">🍃 素食 ${vegCount}</span>` : ''}
                 `;
@@ -144,27 +152,44 @@
                 document.getElementById('dt-name').innerText = t.name;
                 const tableGuests = t.list.map(obj => guests.find(g => g.id === obj.id));
                 const vegCount = tableGuests.filter(g => g.isVeg).length;
-                
-                document.getElementById('dt-stats').innerHTML = `
-                    <span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500 font-bold">共 ${t.list.length} 人</span>
-                    ${vegCount > 0 ? `<span class="text-[10px] px-2 py-1 rounded-full bg-green-100 text-green-700 font-bold">素食 ${vegCount} 人</span>` : ''}
-                `;
-
-                document.getElementById('dt-list').innerHTML = tableGuests.map(g => `
-                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl mb-1.5 border border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-700">${g.name}</span>
-                            ${g.isVeg ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-green-500 text-white font-black scale-90">素</span>' : ''}
-                        </div>
-                        <button onclick="removeG('${t.id}',${g.id})" class="text-red-400 text-[10px] font-black hover:text-red-600">REMOVE</button>
-                    </div>
-                `).join('') || '<p class="text-center text-slate-300 py-6 text-xs italic font-serif">Empty Table</p>';
-                
-                document.getElementById('dt-delete-area').innerHTML = t.id !== 'main' ? `<button onclick="deleteTable('${t.id}')" class="text-red-300 text-[9px] font-bold hover:text-red-500 transition">🗑️ 刪除此桌</button>` : '';
+                document.getElementById('dt-stats').innerHTML = `<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500 font-bold">共 ${t.list.length} 人</span>${vegCount > 0 ? `<span class="text-[10px] px-2 py-1 rounded-full bg-green-100 text-green-700 font-bold">素食 ${vegCount} 人</span>` : ''}`;
+                document.getElementById('dt-list').innerHTML = tableGuests.map(g => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl mb-1.5 border border-slate-100"><span>${g.name} ${g.isVeg?'(素)':''}</span><button onclick="removeG('${t.id}',${g.id})" class="text-red-400 text-[10px] font-black">REMOVE</button></div>`).join('');
+                document.getElementById('dt-delete-area').innerHTML = t.id !== 'main' ? `<button onclick="deleteTable('${t.id}')" class="text-red-300 text-[9px] font-bold">🗑️ 刪除此桌</button>` : '';
                 toggleModal('detail-modal');
             }
         }
 
+        function generateExportData() {
+            let res = "【婚禮座位報告 - 食性統計】\n\n";
+            tables.forEach(t => {
+                const tableGuests = t.list.map(obj => guests.find(g => g.id === obj.id));
+                const vegCount = tableGuests.filter(g => g.isVeg).length;
+                res += `${t.name} (共${t.list.length}人 / 素食${vegCount}人): \n`;
+                res += tableGuests.map(g => g.name + (g.isVeg?'(素)':'')).join('、') || '(空)';
+                res += "\n\n";
+            });
+            document.getElementById('export-text').value = res;
+            toggleModal('export-modal'); // 確保這行有執行
+        }
+
+        function copyToClipboard() {
+            const el = document.getElementById('export-text');
+            el.select();
+            document.execCommand('copy');
+            alert("報告內容已複製到剪貼簿！");
+        }
+
+        function editTableName() {
+            const t = tables.find(x => x.id === currentEditingTid);
+            const name = prompt("修改名稱：", t.name);
+            if (name) { t.customName = name; t.name = name; render(); document.getElementById('dt-name').innerText = name; }
+        }
+        function removeG(tid, gid) {
+            const t = tables.find(x => x.id === tid);
+            t.list = t.list.filter(obj => obj.id !== gid);
+            guests.find(g => g.id === gid).tId = null;
+            toggleModal('detail-modal'); render();
+        }
         function addGuests() {
             const input = document.getElementById('guest-input');
             input.value.split('\n').filter(n=>n.trim()).forEach(rawName => {
@@ -174,33 +199,8 @@
             });
             input.value = ''; toggleModal('guest-modal'); render();
         }
-
-        // --- 其他輔助函式保持不變 ---
-        function editTableName() {
-            const t = tables.find(x => x.id === currentEditingTid);
-            const name = prompt("修改桌次名稱：", t.name);
-            if (name) { t.customName = name; t.name = name; render(); document.getElementById('dt-name').innerText = name; }
-        }
-        function removeG(tid, gid) {
-            const t = tables.find(x => x.id === tid);
-            t.list = t.list.filter(obj => obj.id !== gid);
-            guests.find(g => g.id === gid).tId = null;
-            handleTable(tid); render();
-        }
         function addNewTable() { tables.push({ id: 't'+Date.now(), name: "", cap: 10, list: [], section: '', customName: null }); reorderTables(); render(); }
         function deleteTable(tid) { if(confirm("確定刪除？")){ const idx=tables.findIndex(x=>x.id===tid); tables[idx].list.forEach(o=>guests.find(g=>g.id===o.id).tId=null); tables.splice(idx,1); reorderTables(); toggleModal('detail-modal'); render(); } }
-        function generateExportData() {
-            let res = "【婚禮排座報告 - 食性統計】\n\n";
-            tables.forEach(t => {
-                const tableGuests = t.list.map(obj => guests.find(g => g.id === obj.id));
-                const vegCount = tableGuests.filter(g => g.isVeg).length;
-                res += `${t.name} (共${t.list.length}人 / 素食${vegCount}人): \n`;
-                res += tableGuests.map(g => g.name + (g.isVeg?'(素)':'')).join('、') || '(空)';
-                res += "\n\n";
-            });
-            document.getElementById('export-text').value = res;
-            toggleModal('export-modal');
-        }
         function resetApp() { if(confirm("重置所有資料？")) { localStorage.removeItem(KEY); location.reload(); } }
         function initTables() {
             tables = [{ id: 'main', name: "👑 主桌", cap: 12, list: [], section: 'main', customName: "👑 主桌" }];
